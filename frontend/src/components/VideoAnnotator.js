@@ -1,3 +1,4 @@
+import '../App.css';
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import SecureVideoPlayer from "./SecureVideoPlayer";
@@ -49,65 +50,76 @@ function VideoAnnotator({ user }) {
     }).then(() => alert("Annotation saved!"));
   };
 
-  return (
-    <div style={styles.container}>
-      <div>
-        <h3>Exercise:</h3>
-        <select onChange={(e) => setExercise(e.target.value)} value={exercise}>
-          <option value="">Select exercise</option>
-          {exercises.map((ex) => (
-            <option key={ex} value={ex}>{ex}</option>
-          ))}
-        </select>
-        <h3>Video:</h3>
-        <select onChange={(e) => setVideo(e.target.value)} value={video}>
-          {videos.map((v) => (
-            <option key={v} value={v}>{v}</option>
-          ))}
-        </select>
+return (
+  <div style={styles.container}>
 
-<h3>Labels:</h3>
-{labelNames.map((label, idx) => (
-  <div key={idx}>
-        <p>{label.name}: {label.question}</p>
-    <input
-      type="range"
-      min="0"
-      max="10"
-      value={labels[idx] || 0}
-      onChange={(e) => handleLabelChange(idx, e.target.value)}
-    /> {labels[idx] || 0}
-  </div>
-))}
-        <button onClick={handleSubmit}>Save Annotation</button>
-      </div>
-      <div style={{ marginLeft: "2rem" }}>
-  {/* Old video player commented out
-        {video && exercise && (
-          <video
-            key={video}
-            width="600"
-            controls
-            src={`/api/videos/${exercise}/${video}`}
-            onContextMenu={(e) => e.preventDefault()}
-          />
-  */}
-          {video && exercise && (
-            <SecureVideoPlayer exercise={exercise} video={video} />
-          )}
+    {/* Left column */}
+    <div>
+      <h3>Exercise:</h3>
+      <select onChange={(e) => setExercise(e.target.value)} value={exercise}>
+        <option value="">Select exercise</option>
+        {exercises.map((ex) => (
+          <option key={ex} value={ex}>{ex}</option>
+        ))}
+      </select>
 
-      </div>
+      <h3>Video:</h3>
+      <select onChange={(e) => setVideo(e.target.value)} value={video}>
+        {videos.map((v) => (
+          <option key={v} value={v}>{v}</option>
+        ))}
+      </select>
     </div>
+
+    {/* Middle column */}
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+      {video && exercise && (
+        <SecureVideoPlayer exercise={exercise} video={video} />
+      )}
+    </div>
+
+    {/* Right column */}
+    <div style={{ overflowY: "auto" , padding: "0 10px" }}>
+      <h3>Labels:</h3>
+
+       <p>
+          Taking into account the description and aim of the exercise and observing the
+          whole exercise (all repetitions), please answer the questions choosing one of the
+          following options:
+          <br />
+          1 = Never &nbsp; 2 = Rarely &nbsp; 3 = Sometimes &nbsp; 4 = Often &nbsp; 5 = Always
+          </p>
+
+      {labelNames.map((label, idx) => (
+        <div key={idx} style={{ marginBottom: "1rem" }}>
+          <p style={{ wordWrap: "break-word", whiteSpace: "normal" }}>
+            {label.name}: {label.question}
+          </p>
+          <input
+            type="range"
+            min="0"
+            max="5"
+            value={labels[idx] || 0}
+            onChange={(e) => handleLabelChange(idx, e.target.value)}
+          /> {labels[idx] || 0}
+        </div>
+      ))}
+      <button onClick={handleSubmit}>Save Annotation</button>
+    </div>
+
+  </div>
   );
 }
 
 const styles = {
   container: {
     height: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "#e8efff"
+    display: "grid",
+    gridTemplateColumns: "20% 40% 40%", // Left, Middle, Right
+    gap: "1rem",
+    background: "#e8efff",
+    padding: "3rem",
+    fontSize: "1.1rem" // ⬅ sets base font size for everything
   },
   form: {
     background: "#fff",

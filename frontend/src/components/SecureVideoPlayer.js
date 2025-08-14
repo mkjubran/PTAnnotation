@@ -1,3 +1,4 @@
+import '../App.css';
 import React, { useRef } from "react";
 
 function SecureVideoPlayer({ exercise, video }) {
