@@ -22,10 +22,12 @@ function SecureVideoPlayer({ exercise, video }) {
         onContextMenu={(e) => e.preventDefault()} // Disable right click
       />
 
-      <div style={{ marginTop: "10px" }}>
-        <button onClick={handlePlay}>▶ Play</button>
-        <button onClick={handlePause}>⏸ Pause</button>
+      {/* Add display: 'flex' and gap to the container div */}
+      <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
+      <button onClick={handlePlay}>▶ Play</button>
+      <button onClick={handlePause}>  Pause</button>
       </div>
+
     </div>
   );
 }
