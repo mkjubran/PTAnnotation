@@ -54,7 +54,7 @@ return (
   <div style={styles.container}>
 
     {/* Left column */}
-    <div>
+    <div class="form-container">
       <h3>Exercise:</h3>
       <select onChange={(e) => setExercise(e.target.value)} value={exercise}>
         <option value="">Select exercise</option>
@@ -71,7 +71,7 @@ return (
       </select>
     </div>
 
-    {/* Middle column */}
+    {/* Middle column*/}
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
       {video && exercise && (
         <SecureVideoPlayer exercise={exercise} video={video} />
@@ -92,7 +92,7 @@ return (
 
       {labelNames.map((label, idx) => (
         <div key={idx} style={{ marginBottom: "1rem" }}>
-          <p style={{ wordWrap: "break-word", whiteSpace: "normal" }}>
+          <p className="question-text" >
             {label.name}: {label.question}
           </p>
           <input

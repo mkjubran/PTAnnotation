@@ -78,3 +78,36 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 50%;
   cursor: pointer;
 }
+.question-text {
+  word-wrap: break-word;
+  white-space: normal;
+  margin: 0 0 4px 0; /* reduce space below question */
+}
+
+/* Reduce vertical spacing globally for form elements */
+label, p, select, input, textarea, button, div {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Compact spacing between text (labels, questions) and inputs */
+label, p {
+  line-height: 1.2;       /* tighter multi-line text */
+  margin-bottom: 4px;     /* small space between text and element */
+  word-wrap: break-word;  /* prevent overflow for long text */
+  white-space: normal;    /* allow text wrapping */
+}
+
+/* Compact spacing for form inputs */
+input[type="range"], select, textarea, button {
+  margin-top: 0;
+  margin-bottom: 4px;     /* small space below element */
+}
+
+/* Optional: wrapper for all form elements to control spacing */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;               /* consistent spacing between elements */
+}
