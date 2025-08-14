@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  pt-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        HTTP_PROXY: http://213.244.124.19:3128
+        HTTPS_PROXY: http://213.244.124.19:3128
+    container_name: pt-backend
+    ports:
+      - "8050:8050"
+    volumes:
+      - ./annotations.json:/app/annotations.json
+      - ./videos:/app/videos
+    environment:
+      - FLASK_ENV=production
+      - HTTP_PROXY=http://213.244.124.19:3128
+      - HTTPS_PROXY=http://213.244.124.19:3128
