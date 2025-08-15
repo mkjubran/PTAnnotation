@@ -1,42 +1,42 @@
 {
   "E0": {
-    "name": "Exercise 0",
+    "name": "Seated Hip Flexion",
     "annotations": []
   },
   "E1": {
-    "name": "Exercise 1",
+    "name": "Seated Knee Flexion",
     "annotations": []
   },
   "E2": {
-    "name": "Exercise 2",
+    "name": "Sit to Stand",
     "annotations": []
   },
   "E3": {
-    "name": "Exercise 3",
+    "name": "Standing Hip Abduction",
     "annotations": []
   },
   "E4": {
-    "name": "Exercise 4",
+    "name": "Standing Hip Extension",
     "annotations": []
   },
   "E5": {
-    "name": "Exercise 5",
+    "name": "Shoulder Theraband External Rotation",
     "annotations": []
   },
   "E6": {
-    "name": "Exercise 6",
+    "name": "Shoulder Flexion",
     "annotations": []
   },
   "E7": {
-    "name": "Exercise 7",
+    "name": "Shoulder Extension",
     "annotations": []
   },
   "E8": {
-    "name": "Exercise 8",
+    "name": "Shoulder Abduction",
     "annotations": []
   },
   "E9": {
-    "name": "Exercise 9",
+    "name": "Shoulder Horizontal Flexion",
     "annotations": []
   }
 }

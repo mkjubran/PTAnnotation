@@ -6,6 +6,7 @@ import SecureVideoPlayer from "./SecureVideoPlayer";
 
 function VideoAnnotator({ username }) {
   const [exercises, setExercises] = useState([]);
+  const [exerciseData, setExerciseData] = useState({});
   const [exercise, setExercise] = useState("");
   const [videos, setVideos] = useState([]);
   const [video, setVideo] = useState("");
@@ -15,9 +16,29 @@ function VideoAnnotator({ username }) {
 
   useEffect(() => {
     axios.get("/api/annotations").then((res) => {
+      setExerciseData(res.data); // Store the full data
       setExercises(Object.keys(res.data));
     });
   }, []);
+
+// Function to refresh videos list
+  const refreshVideosList = async () => {
+    if (exercise) {
+      try {
+        const res = await axios.get(`/api/videos/${exercise}`);
+        const list = res.data;
+        setVideos(list);
+        
+        // If current video is not in the updated list, select the first one
+        const currentVideoExists = list.some(v => (v.name || v) === video);
+        if (!currentVideoExists && list.length > 0) {
+          setVideo(list[0].name || list[0]);
+        }
+      } catch (error) {
+        console.error("Failed to refresh videos list:", error);
+      }
+    }
+  };
 
 useEffect(() => {
     if (exercise) {
@@ -69,6 +90,10 @@ useEffect(() => {
         video, // now video is just the string name
         answers
       }, { withCredentials: true });
+
+      // ✅ REFRESH VIDEOS LIST after successful submission
+      await refreshVideosList();
+
       alert("Annotation saved!");
     } catch (e) {
       alert("Failed to save (are you logged in?)");
@@ -85,7 +110,9 @@ useEffect(() => {
         <select onChange={(e) => setExercise(e.target.value)} value={exercise}>
           <option value="">Select exercise</option>
           {exercises.map((ex) => (
-            <option key={ex} value={ex}>{ex}</option>
+            <option key={ex} value={ex}>
+               {ex} - {exerciseData[ex]?.name || ex}
+            </option>
           ))}
         </select>
 
