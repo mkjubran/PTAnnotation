@@ -13,6 +13,7 @@ services:
       - "8050:8050"
     volumes:
       - ./annotations.json:/app/annotations.json
+      - ./data:/app/data
       - ./videos:/app/videos
     environment:
       - FLASK_ENV=production

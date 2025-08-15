@@ -14,26 +14,10 @@ function App() {
       ) : (
         // Show annotation interface if logged in
         <div>
-          <header
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "1rem",
-              background: "#3b82f6",
-              color: "white",
-            }}
-          >
-            <h2 style={{ margin: 0 }}>Welcome, {user.username}!</h2>
+          <header style={{ padding: "1rem", background: "#3b82f6", color: "white" }}>
+            <h2>Welcome, {user.username}!</h2>
             <button
-              style={{
-                padding: "0.5rem 1rem",
-                cursor: "pointer",
-                borderRadius: "5px",  // optional: makes button slightly rounded
-                border: "none",       // removes default border
-                backgroundColor: "#2563eb",
-                color: "white",
-              }}
+              style={{ float: "right", padding: "0.5rem 1rem", cursor: "pointer" }}
               onClick={() => setUser(null)}
             >
               Logout
@@ -47,3 +31,4 @@ function App() {
 }
 
 export default App;
+

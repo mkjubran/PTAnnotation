@@ -1,19 +1,35 @@
 import '../App.css';
 import React, { useState } from "react";
+import axios from "axios";
 
-const Login = ({ onLogin }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+const Login = ({ onLoggedIn }) => {
+  const [username, setUsername] = useState(""); // username field
+  const [password, setPassword] = useState(""); // password field
+  const [err, setErr] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onLogin(username, password);
+    setErr("");
+    if (!username || !password) {
+      setErr("Please enter both username and password.");
+      return;
+    }
+
+    try {
+      // send username & password to your backend API
+      await axios.post("/api/login", { username, password }, { withCredentials: true });
+      onLoggedIn?.({ username });
+    } catch (e) {
+      setErr("Invalid username or password");
+    }
   };
 
   return (
     <div style={styles.container}>
       <form style={styles.form} onSubmit={handleSubmit}>
         <h2 style={styles.title}>PT Video Annotation System</h2>
+        {err && <div style={{ color: "#b91c1c", marginBottom: "0.5rem" }}>{err}</div>}
+
         <label style={styles.label}>Username</label>
         <input
           style={styles.input}
@@ -22,6 +38,7 @@ const Login = ({ onLogin }) => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
+
         <label style={styles.label}>Password</label>
         <input
           style={styles.input}
@@ -30,6 +47,7 @@ const Login = ({ onLogin }) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+
         <button style={styles.button} type="submit">Login</button>
       </form>
     </div>
@@ -38,47 +56,45 @@ const Login = ({ onLogin }) => {
 
 const styles = {
   container: {
-    height: "100vh",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "#e8efff"
+    height: "100vh",
+    backgroundColor: "#e8efff"
   },
   form: {
-    background: "#fff",
+    backgroundColor: "#fff",
     padding: "2rem",
-    borderRadius: "10px",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-    width: "300px",
-    display: "flex",
-    flexDirection: "column",
+    borderRadius: "8px",
+    boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+    width: "100%",
+    maxWidth: "400px"
   },
   title: {
-    textAlign: "center",
-    marginBottom: "1.5rem",
-    color: "#1f2937",
+    marginBottom: "1rem",
+    textAlign: "center"
   },
   label: {
+    display: "block",
     marginBottom: "0.25rem",
-    color: "#1f2937",
-    fontWeight: "500",
+    fontWeight: "bold"
   },
   input: {
-    marginBottom: "1rem",
+    width: "100%",
     padding: "0.5rem",
-    borderRadius: "5px",
-    border: "1px solid #d1d5db",
-    fontSize: "1rem",
+    marginBottom: "1rem",
+    borderRadius: "4px",
+    border: "1px solid #ccc"
   },
   button: {
-    background: "#3b82f6",
-    color: "#fff",
+    width: "100%",
     padding: "0.75rem",
+    backgroundColor: "#3b82f6",
+    color: "white",
     border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontSize: "1rem",
-  },
+    borderRadius: "4px",
+    cursor: "pointer"
+  }
 };
 
 export default Login;

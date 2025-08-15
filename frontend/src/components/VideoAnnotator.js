@@ -1,19 +1,20 @@
+// frontend/src/components/VideoAnnotator.js
 import '../App.css';
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import SecureVideoPlayer from "./SecureVideoPlayer";
 
-function VideoAnnotator({ user }) {
+function VideoAnnotator({ username }) {
   const [exercises, setExercises] = useState([]);
   const [exercise, setExercise] = useState("");
   const [videos, setVideos] = useState([]);
   const [video, setVideo] = useState("");
-  const [labelNames, setLabelNames] = useState([]); // Q1–Q10 from DB
-  const [labels, setLabels] = useState([]); // user-selected values
+  const [labelNames, setLabelNames] = useState([]); // [{name:'Q1', question:'...'}]
+  const [labels, setLabels] = useState([]); // numeric values
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     axios.get("/api/annotations").then((res) => {
-      // The keys are "E0", "E1", etc.
       setExercises(Object.keys(res.data));
     });
   }, []);
@@ -24,90 +25,113 @@ function VideoAnnotator({ user }) {
         setVideos(res.data);
         setVideo(res.data[0] || "");
       });
-   }
+    } else {
+      setVideos([]);
+      setVideo("");
+    }
   }, [exercise]);
 
-  // Fetch label names from DB
   useEffect(() => {
     axios.get("/api/labels").then((res) => {
       setLabelNames(res.data);
-      setLabels(new Array(res.data.length).fill(5)); // Default values
+      setLabels(new Array(res.data.length).fill(5));
     });
   }, []);
 
   const handleLabelChange = (idx, val) => {
-    const newLabels = [...labels];
-    newLabels[idx] = Number(val);
-    setLabels(newLabels);
+    const next = [...labels];
+    next[idx] = Number(val);
+    setLabels(next);
   };
 
-  const handleSubmit = () => {
-    axios.post("http://pt-backend:5000/annotations", {
-      exercise,
-      video,
-      user,
-      labels
-    }).then(() => alert("Annotation saved!"));
+  const handleSubmit = async () => {
+    if (!exercise || !video) {
+      alert("Please choose an exercise and a video first.");
+      return;
+    }
+
+    const answers = labelNames.map((ln, i) => ({
+      question_name: ln.name,
+      label_value: labels[i] ?? 0
+    }));
+
+    try {
+      setSaving(true);
+      await axios.post("/api/label_events", {
+        username, // send logged-in username
+        exercise,
+        video,
+        answers
+      }, { withCredentials: true });
+      alert("Annotation saved!");
+    } catch (e) {
+      alert("Failed to save (are you logged in?)");
+    } finally {
+      setSaving(false);
+    }
   };
 
-return (
-  <div style={styles.container}>
+  return (
+    <div style={styles.container}>
+      {/* Left column */}
+      <div className="form-container">
+        <h3>Exercise:</h3>
+        <select onChange={(e) => setExercise(e.target.value)} value={exercise}>
+          <option value="">Select exercise</option>
+          {exercises.map((ex) => (
+            <option key={ex} value={ex}>{ex}</option>
+          ))}
+        </select>
 
-    {/* Left column */}
-    <div class="form-container">
-      <h3>Exercise:</h3>
-      <select onChange={(e) => setExercise(e.target.value)} value={exercise}>
-        <option value="">Select exercise</option>
-        {exercises.map((ex) => (
-          <option key={ex} value={ex}>{ex}</option>
-        ))}
-      </select>
+        <h3>Video:</h3>
+        <select onChange={(e) => setVideo(e.target.value)} value={video} disabled={!exercise}>
+          {videos.map((v) => (
+            <option key={v} value={v}>{v}</option>
+          ))}
+        </select>
+      </div>
 
-      <h3>Video:</h3>
-      <select onChange={(e) => setVideo(e.target.value)} value={video}>
-        {videos.map((v) => (
-          <option key={v} value={v}>{v}</option>
-        ))}
-      </select>
-    </div>
+      {/* Middle column */}
+      <div className="video-pane">
+        {video && exercise && (
+          <SecureVideoPlayer exercise={exercise} video={video} />
+        )}
+      </div>
 
-    {/* Middle column*/}
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-      {video && exercise && (
-        <SecureVideoPlayer exercise={exercise} video={video} />
-      )}
-    </div>
-
-    {/* Right column */}
-    <div style={{ overflowY: "auto" , padding: "0 10px" }}>
-      <h3>Labels:</h3>
-
-       <p>
+      {/* Right column */}
+      <div style={{ overflowY: "auto" , padding: "0 10px" }}>
+        <h3>Labels:</h3>
+        <p>
           Taking into account the description and aim of the exercise and observing the
           whole exercise (all repetitions), please answer the questions choosing one of the
           following options:
           <br />
           1 = Never &nbsp; 2 = Rarely &nbsp; 3 = Sometimes &nbsp; 4 = Often &nbsp; 5 = Always
-          </p>
+        </p>
 
-      {labelNames.map((label, idx) => (
-        <div key={idx} style={{ marginBottom: "1rem" }}>
-          <p className="question-text" >
-            {label.name}: {label.question}
-          </p>
-          <input
-            type="range"
-            min="0"
-            max="5"
-            value={labels[idx] || 0}
-            onChange={(e) => handleLabelChange(idx, e.target.value)}
-          /> {labels[idx] || 0}
-        </div>
-      ))}
-      <button onClick={handleSubmit}>Save Annotation</button>
+        {labelNames.map((label, idx) => (
+          <div key={idx} style={{ marginTop: "1.3rem", marginBottom: "0.1rem" }}>
+            <p className="question-text">
+              {label.name}: {label.question}
+            </p>
+            <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+              <input
+                type="range"
+                min="0"
+                max="5"
+                value={labels[idx] || 0}
+                onChange={(e) => handleLabelChange(idx, e.target.value)}
+                style={{ width: "80%" }}
+              />
+              <span style={{minWidth:24, textAlign:"center"}}>{labels[idx] || 0}</span>
+            </div>
+          </div>
+        ))}
+        <button onClick={handleSubmit} disabled={saving}>
+          {saving ? "Saving..." : "Save Annotation"}
+        </button>
+      </div>
     </div>
-
-  </div>
   );
 }
 
@@ -115,49 +139,13 @@ const styles = {
   container: {
     height: "100vh",
     display: "grid",
-    gridTemplateColumns: "20% 40% 40%", // Left, Middle, Right
+    gridTemplateColumns: "20% 40% 40%",
     gap: "1rem",
     background: "#e8efff",
-    padding: "3rem",
-    fontSize: "1.1rem" // ⬅ sets base font size for everything
-  },
-  form: {
-    background: "#fff",
-    padding: "2rem",
-    borderRadius: "10px",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-    width: "300px",
-    display: "flex",
-    flexDirection: "column",
-  },
-  title: {
-    textAlign: "center",
-    marginBottom: "1.5rem",
-    color: "#1f2937",
-  },
-  label: {
-    marginBottom: "0.25rem",
-    color: "#1f2937",
-    fontWeight: "500",
-  },
-  input: {
-    marginBottom: "1rem",
-    padding: "0.5rem",
-    borderRadius: "5px",
-    border: "1px solid #d1d5db",
-    fontSize: "1rem",
-  },
-  button: {
-    background: "#3b82f6",
-    color: "#fff",
-    padding: "0.75rem",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontSize: "1rem",
-  },
+    padding: "1rem",
+    fontSize: "1.05rem"
+  }
 };
-
 
 export default VideoAnnotator;
 

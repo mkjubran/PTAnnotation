@@ -1,9 +1,9 @@
-k/* Global page styling */
+/* Global page styling */
 body {
   font-family: Arial, sans-serif;
   font-size: 16px; /* Slightly smaller */
   margin: 0;
-  padding: 6px; /* Space from edges of browser */
+  padding: 0; /* Space from edges of browser */
   background-color: #e8efff;
   color: #1f2937;
 }
@@ -79,36 +79,35 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 50%;
   cursor: pointer;
 }
+
+/* Reduce vertical spacing globally for form elements */
 .question-text {
   word-wrap: break-word;
   white-space: normal;
-  margin: 0 0 4px 0; /* reduce space below question */
+  margin: 8px 0 8px 0; /* reduce space below question */
 }
 
-/* Reduce vertical spacing globally for form elements */
-label, p, select, input, textarea, button, div {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* Compact spacing between text (labels, questions) and inputs */
-label, p {
-  line-height: 1.2;       /* tighter multi-line text */
-  margin-bottom: 4px;     /* small space between text and element */
-  word-wrap: break-word;  /* prevent overflow for long text */
-  white-space: normal;    /* allow text wrapping */
-}
-
-/* Compact spacing for form inputs */
-input[type="range"], select, textarea, button {
-  margin-top: 0;
-  margin-bottom: 4px;     /* small space below element */
-}
 
 /* Optional: wrapper for all form elements to control spacing */
 .form-container {
   display: flex;
   flex-direction: column;
   gap: 6px;               /* consistent spacing between elements */
+}
+
+
+.container {
+    max-width: 100%;
+    padding: 10px; /* optional */
+    box-sizing: border-box;
+}
+
+input[type="range"] {
+    width: 100%; /* make sliders full width */
+    box-sizing: border-box;
+}
+
+.video-pane {
+  display: flex;
+  justify-content: center;  /* Horizontal centering */
 }
