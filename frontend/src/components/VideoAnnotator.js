@@ -19,17 +19,23 @@ function VideoAnnotator({ username }) {
     });
   }, []);
 
-  useEffect(() => {
-    if (exercise) {
-      axios.get(`/api/videos/${exercise}`).then((res) => {
-        setVideos(res.data);
-        setVideo(res.data[0] || "");
-      });
-    } else {
-      setVideos([]);
-      setVideo("");
-    }
-  }, [exercise]);
+useEffect(() => {
+  if (exercise) {
+    axios.get(`/api/videos/${exercise}`).then((res) => {
+      const list = res.data;
+      setVideos(list);
+
+      if (list.length > 0) {
+        setVideo(list[0].name || list[0]); // supports both object and string formats
+      } else {
+        setVideo(""); // no videos
+      }
+    });
+  } else {
+    setVideos([]);
+    setVideo("");
+  }
+}, [exercise]);
 
   useEffect(() => {
     axios.get("/api/labels").then((res) => {
@@ -60,7 +66,7 @@ function VideoAnnotator({ username }) {
       await axios.post("/api/label_events", {
         username, // send logged-in username
         exercise,
-        video,
+        video, // now video is just the string name
         answers
       }, { withCredentials: true });
       alert("Annotation saved!");
@@ -83,20 +89,29 @@ function VideoAnnotator({ username }) {
           ))}
         </select>
 
-        <h3>Video:</h3>
-        <select onChange={(e) => setVideo(e.target.value)} value={video} disabled={!exercise}>
-          {videos.map((v) => (
-            <option key={v} value={v}>{v}</option>
-          ))}
-        </select>
+       <h3>Video:</h3>
+<select
+  value={video}
+  onChange={(e) => setVideo(e.target.value)}
+  disabled={!exercise}
+>
+  {videos.map((v) => {
+    const name = v.name || v;
+    return (
+      <option key={name} value={name}>
+        {name} {v.done ? "(Done)" : ""}
+      </option>
+    );
+  })}
+</select>
       </div>
 
       {/* Middle column */}
-      <div className="video-pane">
-        {video && exercise && (
-          <SecureVideoPlayer exercise={exercise} video={video} />
-        )}
-      </div>
+<div className="video-pane">
+  {video && videos.some(v => v.name === video) && (
+    <SecureVideoPlayer exercise={exercise} video={video} />
+  )}
+</div>
 
       {/* Right column */}
       <div style={{ overflowY: "auto" , padding: "0 10px" }}>

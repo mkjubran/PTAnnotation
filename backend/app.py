@@ -67,10 +67,32 @@ def list_exercises():
     videos_dir = os.path.join(app.root_path, "videos")
     return jsonify([d for d in os.listdir(videos_dir) if os.path.isdir(os.path.join(videos_dir, d))])
 
-@app.route("/api/videos/<exercise>", methods=["GET"])
-def list_videos(exercise):
+#@app.route("/api/videos/<exercise>", methods=["GET"])
+#def list_videos(exercise):
+#    exercise_dir = os.path.join(app.root_path, "videos", exercise)
+#    return jsonify([f for f in os.listdir(exercise_dir) if os.path.isfile(os.path.join(exercise_dir, f))])
+
+
+@app.route("/api/videos/<exercise>")
+@login_required
+def get_videos(exercise):
     exercise_dir = os.path.join(app.root_path, "videos", exercise)
-    return jsonify([f for f in os.listdir(exercise_dir) if os.path.isfile(os.path.join(exercise_dir, f))])
+    all_videos = [f for f in os.listdir(exercise_dir) if os.path.isfile(os.path.join(exercise_dir, f))]
+
+    user_id = session["user_id"]
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT DISTINCT video FROM label_events
+        WHERE user_id = ? AND exercise = ?
+    """, (user_id, exercise))
+    done_set = {row["video"] for row in cur.fetchall()}
+    conn.close()
+
+    return jsonify([
+        {"name": v, "done": v in done_set}
+        for v in all_videos
+    ])
 
 #@app.route("/api/videos/<exercise>/<video>")
 #def serve_video(exercise, video):
