@@ -20,22 +20,22 @@ function VideoAnnotator({ username }) {
   }, []);
 
 useEffect(() => {
-  if (exercise) {
-    axios.get(`/api/videos/${exercise}`).then((res) => {
-      const list = res.data;
-      setVideos(list);
-
-      if (list.length > 0) {
-        setVideo(list[0].name || list[0]); // supports both object and string formats
-      } else {
-        setVideo(""); // no videos
-      }
-    });
-  } else {
-    setVideos([]);
-    setVideo("");
-  }
-}, [exercise]);
+    if (exercise) {
+      // Reset video immediately when exercise changes
+      setVideo("");
+      
+      axios.get(`/api/videos/${exercise}`).then((res) => {
+        const list = res.data;
+        setVideos(list);
+        if (list.length > 0) {
+          setVideo(list[0].name || list[0]); // supports both object and string formats
+        }
+      });
+    } else {
+      setVideos([]);
+      setVideo("");
+    }
+  }, [exercise]);
 
   useEffect(() => {
     axios.get("/api/labels").then((res) => {
@@ -108,7 +108,7 @@ useEffect(() => {
 
       {/* Middle column */}
 <div className="video-pane">
-  {video && videos.some(v => v.name === video) && (
+  {video && exercise && videos.some(v => v.name === video) && (
     <SecureVideoPlayer exercise={exercise} video={video} />
   )}
 </div>
