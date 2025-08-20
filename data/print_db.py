@@ -34,8 +34,20 @@ CREATE TABLE IF NOT EXISTS label_events (
 )
 """)
 
+# --- login_logs table ---
+c.execute("""
+CREATE TABLE IF NOT EXISTS login_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    username TEXT NOT NULL,
+    success INTEGER NOT NULL,
+    ip TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
 conn.commit()
-print("users + label_events tables ensured.")
+print("users + label_events + login_logs tables ensured.")
 
 # ==================== PRINT DATABASE CONTENT ====================
 
@@ -153,7 +165,7 @@ def print_database_summary():
 print_database_summary()
 
 # Print content of each table and export to CSV
-tables_to_print = ['users', 'label_events']
+tables_to_print = ['users', 'label_events', 'login_logs']
 exported_files = []
 
 print(f"\n{'='*60}")
