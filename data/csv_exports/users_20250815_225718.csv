@@ -1,2 +1,0 @@
-id,username,password_hash,is_admin,created_at
-1,mjubran,pbkdf2:sha256:150000$R6DFUvGa$3332fda34dc38465ed53ae588cb97c911b41d7cbff18908fa89cfa4d7c891217,0,2025-08-15 13:39:02
