@@ -34,6 +34,20 @@ CREATE TABLE IF NOT EXISTS label_events (
 )
 """)
 
+# --- login_logs table ---
+# stores all login attempts (success/failure)
+c.execute("""
+CREATE TABLE IF NOT EXISTS login_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,              -- NULL if login failed
+    username TEXT NOT NULL,
+    success INTEGER NOT NULL,     -- 1 = success, 0 = failure
+    ip TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+)
+""")
+
 conn.commit()
 conn.close()
 print("users + label_events tables ensured.")

@@ -1,3 +1,4 @@
 flask
 flask-cors
 bcrypt==4.0.1
+nano

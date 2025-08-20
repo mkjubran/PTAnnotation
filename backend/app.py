@@ -43,6 +43,18 @@ def get_user(username):
     conn.close()
     return row
 
+# --- helper to log login attempts ---
+def log_login_attempt(user_id, username, success):
+    conn = sqlite3.connect(os.path.join(app.root_path, "./data/app.db"))
+    cur = conn.cursor()
+    ip = request.remote_addr  # get client IP
+    cur.execute("""
+        INSERT INTO login_logs (user_id, username, success, ip, created_at)
+        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+    """, (user_id, username, int(success), ip))
+    conn.commit()
+    conn.close()
+
 # -----------------
 # API routes
 # -----------------
@@ -147,6 +159,21 @@ def register():
 
     return jsonify({"status": "ok"})
     
+#@app.route("/api/login", methods=["POST"])
+#def login():
+#    data = request.get_json()
+#    username = data.get("username")
+#    password = data.get("password")
+#
+#    row = get_user(username)
+#    if not row or not check_password_hash(row["password_hash"], password):
+#        return {"error": "Invalid username or password"}, 401
+#
+#    session["user_id"] = row["id"]
+#    return {"username": username}
+
+
+
 @app.route("/api/login", methods=["POST"])
 def login():
     data = request.get_json()
@@ -155,10 +182,15 @@ def login():
 
     row = get_user(username)
     if not row or not check_password_hash(row["password_hash"], password):
+        log_login_attempt(user_id=row["id"] if row else None, username=username, success=False)
         return {"error": "Invalid username or password"}, 401
 
     session["user_id"] = row["id"]
+    session["username"] = username
+    session["is_admin"] = row["is_admin"]
+    log_login_attempt(user_id=row["id"], username=username, success=True)
     return {"username": username}
+
 
 @app.post("/api/logout")
 def logout():
